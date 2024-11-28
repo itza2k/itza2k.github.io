@@ -1,0 +1,353 @@
+---
+---
+<div id="bg-animation"></div>
+<section class="hero">
+  <div class="hero-content">
+    <h1 id="title" class="pixel-font">itza2k</h1>
+    <div class="info">
+      <p class="name mono-font">Akkshay SN</p>
+      <p class="bio mono-font">CSE Undergrad • App Developer • Ex-Caffeine Fueled</p>
+      <p class="location mono-font">Based in Chennai, India</p>
+    </div>
+
+    <div class="terminal">
+      <p class="command mono-font">$ whoami</p>
+      <p class="response mono-font">The guy who makes apps, breaks apps, and occasionally fixes them (not always ╥﹏╥). Constantly exploring and evolving.</p>
+      <p class="command mono-font">$ rm boredom</p>
+      <p class="response mono-font">Kotlin 📱 • Android 🤖 • ML 💰 • Hackathon 🥷 • Biker 🏍️</p>
+    </div>
+
+    <div class="social-links">
+      <a href="https://github.com/itza2k" target="_blank" rel="noopener" class="mono-font" aria-label="GitHub">github</a>
+      <a href="https://instagram.com/akkshay.tech" target="_blank" rel="noopener" class="mono-font" aria-label="Instagram">instagram</a>
+      <a href="https://linkedin.com/in/akkshaysn" target="_blank" rel="noopener" class="mono-font" aria-label="LinkedIn">linkedin</a>
+      <a href="https://twitter.com/_itza2k_" target="_blank" rel="noopener" class="mono-font" aria-label="Twitter">x</a>
+      <a href="mailto:akkshaytechworld@gmail.com" class="email mono-font" aria-label="Email">email</a>
+    </div>
+  </div>
+</section>
+
+<script>
+  import * as THREE from 'three';
+
+  if (THREE) {
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById('bg-animation').appendChild(renderer.domElement);
+
+    const geometry = new THREE.TorusGeometry(20, 7, 16, 100);
+    const material = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      wireframe: true
+    });
+    const torus = new THREE.Mesh(geometry, material);
+    scene.add(torus);
+
+    const particlesGeometry = new THREE.BufferGeometry();
+    const particlesCount = 8000;
+    const posArray = new Float32Array(particlesCount * 3);
+    const colorsArray = new Float32Array(particlesCount * 3);
+    const customColors = [
+      0xff6347, 0x1e90ff, 0x32cd32, 0xffd700, 0x8a2be2, 0xff69b4, 0x00ced1, 0xff4500
+    ];
+
+    for (let i = 0; i < particlesCount * 3; i += 3) {
+      posArray[i] = (Math.random() - 0.5) * 500;
+      posArray[i + 1] = (Math.random() - 0.5) * 500;
+      posArray[i + 2] = (Math.random() - 0.5) * 500;
+
+      const color = new THREE.Color(customColors[Math.floor(Math.random() * customColors.length)]);
+      colorsArray[i] = color.r;
+      colorsArray[i + 1] = color.g;
+      colorsArray[i + 2] = color.b;
+    }
+
+    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+    particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorsArray, 3));
+
+    const particlesMaterial = new THREE.PointsMaterial({
+      size: 0.12,
+      vertexColors: true
+    });
+
+    const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+    scene.add(particlesMesh);
+
+    const ambientLight = new THREE.AmbientLight(0x404040);
+    scene.add(ambientLight);
+
+    const pointLight = new THREE.PointLight(0xffffff, 1);
+    pointLight.position.set(50, 50, 50);
+    scene.add(pointLight);
+
+    camera.position.z = 80;
+
+    let mouseX = 0;
+    let mouseY = 0;
+
+    function onDocumentMouseMove(event) {
+      mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+      mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+    }
+
+    document.addEventListener('mousemove', onDocumentMouseMove, false);
+
+    function animate() {
+      requestAnimationFrame(animate);
+      torus.rotation.x += 0.01;
+      torus.rotation.y += 0.01;
+      torus.rotation.x += mouseY * 0.02;
+      torus.rotation.y += mouseX * 0.02;
+      particlesMesh.rotation.y += 0.001;
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    const title = document.getElementById('title');
+    let text = title.innerText;
+    title.innerText = '';
+    let i = 0;
+
+    function typeWriter() {
+      if (i < text.length) {
+        title.innerText += text.charAt(i);
+        i++;
+        if (i === text.length) {
+          title.innerHTML += '<span id="cursor" class="blink"></span>';
+          blinkCursor();
+        } else {
+          setTimeout(typeWriter, 100);
+        }
+      }
+    }
+
+    setTimeout(typeWriter, 500);
+
+    function blinkCursor() {
+      const cursor = document.getElementById('cursor');
+      cursor.style.opacity = '0';
+      setTimeout(() => {
+        cursor.style.opacity = '1';
+        setTimeout(blinkCursor, 500);
+      }, 500);
+    }
+
+    let scrollTimeout;
+    document.addEventListener('scroll', () => {
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+      scrollTimeout = setTimeout(() => {
+        const scrollPosition = window.scrollY;
+        document.getElementById('bg-animation').style.transform = `translateY(${scrollPosition * 0.5}px)`;
+      }, 10);
+    });
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    });
+  }
+</script>
+
+<style>
+#bg-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    transition: transform 0.1s ease-out;
+    }
+
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    }
+
+.hero-content {
+    max-width: 600px;
+    text-align: left;
+    animation: fadeIn 2s ease-in-out;
+    }
+
+@keyframes fadeIn {
+    from {
+    opacity: 0;
+    transform: translateY(-20px);
+    }
+    to {
+    opacity: 1;
+    transform: translateY(0);
+    }
+    }
+
+.pixel-font {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    }
+
+.info {
+    margin-bottom: 2rem;
+    }
+
+.name {
+    font-size: 1.8rem;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    letter-spacing: 1px;
+    }
+
+.bio {
+    font-size: 1.2rem;
+    color: #a0a0a0;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.5px;
+    }
+
+.location {
+    font-size: 1rem;
+    color: #707070;
+    }
+
+.terminal {
+    background: rgba(20, 20, 20, 0.5);
+    padding: 1.5rem;
+    border-radius: 4px;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
+    }
+
+.command {
+    color: #707070;
+    margin-bottom: 0.5rem;
+    }
+
+.response {
+    color: #fff;
+    margin-bottom: 1rem;
+    }
+
+.social-links {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    }
+
+.social-links a {
+    color: #707070;
+    text-decoration: none;
+    transition: color 0.3s ease, transform 0.3s ease;
+    position: relative;
+    }
+
+.social-links a:hover {
+    color: #fff;
+    transform: scale(1.1);
+    }
+
+.social-links a:hover::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: #fff;
+    animation: underline 0.3s ease-in-out;
+    }
+
+.mono-font {
+    font-family: 'Monaco', monospace;
+    }
+
+.blink {
+    animation: blink 1s infinite;
+    }
+
+@keyframes blink {
+    0% {
+        opacity: 0;
+        }
+    100% {
+        opacity: 1;
+        }
+    }
+
+@keyframes underline {
+    from {
+    width: 0;
+    }
+    to {
+    width: 100%;
+    }
+    }
+
+@media (max-width: 768px) {
+    .pixel-font {
+    font-size: 2rem;
+    }
+
+    .name {
+    font-size: 1.4rem;
+    }
+
+    .bio {
+    font-size: 1rem;
+    }
+
+    .terminal {
+    padding: 1rem;
+    }
+
+    .social-links {
+    gap: 1rem;
+    }
+    }
+
+.trail {
+    width: 10px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    position: absolute;
+    pointer-events: none;
+    transition: transform 0.1s ease;
+    }
+
+.confetti {
+    position: fixed;
+    top: 0;
+    width: 10px;
+    height: 10px;
+    opacity: 0.7;
+    animation: fall linear forwards;
+    }
+
+@keyframes fall {
+    to {
+    transform: translateY(100vh) rotate(360deg);
+    }
+    }
+</style>
